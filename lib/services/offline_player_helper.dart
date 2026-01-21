@@ -9,8 +9,13 @@ class OfflinePlayerHelper extends PlayerHelper {
   late int bitrate;
   late final DownloadMetadata downloadMetadata;
 
-  OfflinePlayerHelper({required playbackInfo, required this.downloadMetadata})
-      : super(playbackInfo: playbackInfo) {
+  OfflinePlayerHelper(
+      {required playbackInfo,
+      required this.downloadMetadata,
+      required logger,
+      String? mpvConfig})
+      : super(
+            playbackInfo: playbackInfo, logger: logger, mpvConfig: mpvConfig) {
     audioStream = getDefaultAudio();
     subtitle = getDefaultSubtitle();
     isSubtitleEnabled = subtitle.index != -1;
@@ -34,7 +39,7 @@ class OfflinePlayerHelper extends PlayerHelper {
   }
 
   @override
-  Future<void> initStream(int startTimeTicks, Timer? playbackTimer) async {
+  Future<void> initStream(int startTimeTicks) async {
     String streamUrl = downloadMetadata.path!;
     player.open(
         Media(streamUrl, start: Duration(microseconds: startTimeTicks ~/ 10)));
@@ -61,7 +66,7 @@ class OfflinePlayerHelper extends PlayerHelper {
 
   // no additional logic needed for offline playback
   @override
-  void backButtonPressed() async {}
+  Future<void> backButtonPressed() async {}
 
   @override
   Future<void> setAudio(MediaStream mediaStream) async {

@@ -7,12 +7,14 @@ import 'package:intl/intl.dart' as intl;
 import 'package:jellyflix/components/player_settings_dialog.dart'
     show PlayerSettingsDialog;
 import 'package:jellyflix/models/bitrates.dart';
+import 'package:jellyflix/services/jfx_logger.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:tentacle/tentacle.dart';
 import 'package:universal_platform/universal_platform.dart';
 
 class PlayerHelper {
+  late final JfxLogger logger;
   Map<int, String> bitrateMap = BitRates().map;
 
   PlaybackInfoResponse playbackInfo;
@@ -36,7 +38,8 @@ class PlayerHelper {
   ));
   late final VideoController controller;
 
-  PlayerHelper({required this.playbackInfo}) {
+  PlayerHelper(
+      {required this.playbackInfo, required this.logger, String? mpvConfig}) {
     initAudioList();
     initSubtitleList();
     audioStream = getDefaultAudio();
@@ -44,6 +47,35 @@ class PlayerHelper {
     isSubtitleEnabled = subtitle.index != -1;
     isTranscoding = playbackInfo.mediaSources![0].transcodingUrl != null;
     controller = VideoController(player);
+
+    // Apply custom MPV config if provided
+    if (mpvConfig != null && mpvConfig.isNotEmpty) {
+      _applyMpvConfig(mpvConfig);
+    }
+  }
+
+  void _applyMpvConfig(String config) {
+    if (player.platform is NativePlayer) {
+      final lines = config.split('\n');
+      for (final line in lines) {
+        final trimmed = line.trim();
+        if (trimmed.isEmpty || trimmed.startsWith('#')) {
+          continue;
+        }
+        final parts = trimmed.split('=');
+        if (parts.length == 2) {
+          final key = parts[0].trim();
+          final value = parts[1].trim();
+          try {
+            (player.platform as dynamic).setProperty(key, value);
+          } catch (e) {
+            logger.warning(
+                "Failed to set MPV property '$key' with value '$value': $e");
+            // Silently ignore invalid properties
+          }
+        }
+      }
+    }
   }
 
   Map<int, String> getBitrateMap() {
@@ -141,6 +173,8 @@ class PlayerHelper {
       seekBarMargin: const EdgeInsets.only(bottom: 55),
       padding: const EdgeInsets.only(left: 50, right: 50),
       seekOnDoubleTap: true,
+      volumeGesture: true,
+      brightnessGesture: true,
     );
   }
 
@@ -169,7 +203,11 @@ class PlayerHelper {
     return [
       BackButton(
         onPressed: () async {
-          backButtonPressed;
+          try {
+            await backButtonPressed().timeout(const Duration(seconds: 2));
+          } catch (e) {
+            logger.error("Player: Couldn't report playback finished");
+          }
           if (UniversalPlatform.isDesktop &&
               (key.currentState?.isFullscreen() ?? false)) {
             await key.currentState?.exitFullscreen();
@@ -300,11 +338,11 @@ class PlayerHelper {
     ];
   }
 
-  void backButtonPressed() async {
+  Future<void> backButtonPressed() async {
     throw UnimplementedError();
   }
 
-  Future<void> initStream(int startTimeTicks, Timer? playbackTimer) {
+  Future<void> initStream(int startTimeTicks) {
     throw UnimplementedError();
   }
 

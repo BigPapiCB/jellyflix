@@ -4,32 +4,32 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:jellyflix/models/bitrates.dart';
 import 'package:jellyflix/l10n/generated/app_localizations.dart';
 
-class SetDownloadBitrateDialog extends HookConsumerWidget {
-  const SetDownloadBitrateDialog({
+class SetStreamingBitrateDialog extends HookConsumerWidget {
+  const SetStreamingBitrateDialog({
     super.key,
-    required int downloadBitrate,
-  }) : _downloadBitrate = downloadBitrate;
+    required int streamingBitrate,
+  }) : _streamingBitrate = streamingBitrate;
 
-  final int _downloadBitrate;
+  final int _streamingBitrate;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final downloadBitrate = useState(_downloadBitrate);
+    final streamingBitrate = useState(_streamingBitrate);
 
     return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.setLocalDownloadBitrate),
+      title: const Text('Max Streaming Bitrate'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(AppLocalizations.of(context)!.maxDownloadBitrateText),
+          const Text('Set the maximum bitrate for streaming playback.'),
           const SizedBox(height: 20),
           SizedBox(
             height: 250,
             width: 350,
             child: RadioGroup<int>(
-              groupValue: downloadBitrate.value,
+              groupValue: streamingBitrate.value,
               onChanged: (value) {
-                downloadBitrate.value = value!;
+                streamingBitrate.value = value!;
               },
               child: ListView.builder(
                 shrinkWrap: true,
@@ -40,15 +40,13 @@ class SetDownloadBitrateDialog extends HookConsumerWidget {
                         value: BitRates().map.keys.toList()[index]),
                     title: Text(BitRates().map.values.toList()[index]),
                     onTap: () {
-                      downloadBitrate.value = BitRates().map.keys.toList()[index];
+                      streamingBitrate.value = BitRates().map.keys.toList()[index];
                     },
                   );
                 },
               ),
             ),
           ),
-          Text(AppLocalizations.of(context)!.downloadApproxFilesize(
-              (downloadBitrate.value * 360 / 1000000000).toStringAsFixed(2)))
         ],
       ),
       actions: [
@@ -60,7 +58,7 @@ class SetDownloadBitrateDialog extends HookConsumerWidget {
         ),
         TextButton(
           onPressed: () {
-            Navigator.pop(context, downloadBitrate.value);
+            Navigator.pop(context, streamingBitrate.value);
           },
           child: Text(AppLocalizations.of(context)!.save),
         ),

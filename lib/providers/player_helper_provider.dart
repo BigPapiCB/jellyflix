@@ -11,7 +11,13 @@ import 'package:jellyflix/services/stream_player_helper.dart';
 final streamPlayerHelperProvider = FutureProvider.autoDispose
     .family<StreamPlayerHelper, String>((ref, itemId) async {
   ApiService apiService = ref.read(apiProvider);
-  var item = await ref.read(apiProvider).getPlaybackInfo(itemId: itemId);
+  final maxStreamingBitrate =
+      ref.read(databaseProvider("settings")).get("maxStreamingBitrate") as int? ??
+          1000000000;
+  var item = await ref.read(apiProvider).getPlaybackInfo(
+        itemId: itemId,
+        maxStreamingBitrate: maxStreamingBitrate,
+      );
   final mpvConfig = ref.read(databaseProvider("settings")).get("mpvConfig") ??
       MpvConfigDialog.getDefaultConfig();
   final logger = ref.read(loggerProvider);

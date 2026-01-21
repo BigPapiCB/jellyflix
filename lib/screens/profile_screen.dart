@@ -6,6 +6,7 @@ import 'package:jellyflix/components/mpv_config_dialog.dart';
 import 'package:jellyflix/components/profile_image.dart';
 import 'package:jellyflix/components/quick_connect_dialog.dart';
 import 'package:jellyflix/components/set_download_bitrate_dialog.dart';
+import 'package:jellyflix/components/set_streaming_bitrate_dialog.dart';
 import 'package:jellyflix/components/switch_settings_tile.dart';
 import 'package:jellyflix/models/bitrates.dart';
 import 'package:jellyflix/models/screen_paths.dart';
@@ -25,6 +26,9 @@ class ProfileScreen extends HookConsumerWidget {
     final downloadBitrate = useState(
         ref.read(databaseProvider("settings")).get("downloadBitrate") ??
             BitRates.defaultBitrate());
+    final streamingBitrate = useState(
+        ref.read(databaseProvider("settings")).get("maxStreamingBitrate") ??
+            1000000000);
     final disableImageCaching = useState(
         ref.read(databaseProvider("settings")).get("disableImageCaching") ??
             false);
@@ -202,6 +206,30 @@ class ProfileScreen extends HookConsumerWidget {
                                     .read(databaseProvider("settings"))
                                     .put("downloadBitrate",
                                         downloadBitrate.value);
+                              }
+                            },
+                          ),
+                          ListTile(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15)),
+                            leading: const Icon(Icons.stream_rounded),
+                            title: const Text('Max Streaming Bitrate'),
+                            trailing: Text(
+                                BitRates().map[streamingBitrate.value] ?? ""),
+                            onTap: () async {
+                              // show dialog
+                              var result = await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return SetStreamingBitrateDialog(
+                                        streamingBitrate: streamingBitrate.value);
+                                  });
+                              if (result != null) {
+                                streamingBitrate.value = result;
+                                await ref
+                                    .read(databaseProvider("settings"))
+                                    .put("maxStreamingBitrate",
+                                        streamingBitrate.value);
                               }
                             },
                           ),

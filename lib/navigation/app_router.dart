@@ -8,8 +8,10 @@ import 'package:jellyflix/components/responsive_navigation_bar.dart';
 import 'package:jellyflix/models/screen_paths.dart';
 import 'package:jellyflix/providers/auth_provider.dart';
 import 'package:jellyflix/providers/connectivity_provider.dart';
+import 'package:jellyflix/providers/logger_provider.dart';
 import 'package:jellyflix/screens/detail_screen.dart';
 import 'package:jellyflix/screens/download_screen.dart';
+import 'package:jellyflix/screens/error_screen.dart';
 import 'package:jellyflix/screens/home_screen.dart';
 import 'package:jellyflix/screens/library_screen.dart';
 import 'package:jellyflix/screens/loading_screen.dart';
@@ -175,10 +177,8 @@ class AppRouter {
               context: context, state: state, child: const LoadingScreen())),
     ],
     errorBuilder: (context, state) {
-      //TODO Add 404 screen
-      print("Error: ${state.error}");
-      print("Error");
-      return const LoadingScreen();
+      _ref.read(loggerProvider).error("Router error: ${state.error}");
+      return ErrorScreen(error: state.error);
     },
     redirect: (context, state) async {
       final isGoingToOfflinePlayer =

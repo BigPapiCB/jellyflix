@@ -35,7 +35,7 @@ class DatabaseService {
   Future<void> openBox() async {
     String? key;
     try {
-      String? key = await secureStorage
+      key = await secureStorage
           .read('encryptionKey')
           .timeout(const Duration(milliseconds: 500), onTimeout: () => null);
     } catch (e) {

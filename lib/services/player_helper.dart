@@ -157,10 +157,9 @@ class PlayerHelper {
     GlobalKey<VideoState> key, {
     required String title,
     required ValueNotifier<bool> subtitleEnabled,
-    //TODO make required
-    ValueNotifier<MediaStream>? subtitleTrack,
-    ValueNotifier<MediaStream>? audioTrack,
-    ValueNotifier<int>? maxStreamingBitrate,
+    required ValueNotifier<MediaStream> subtitleTrack,
+    required ValueNotifier<MediaStream> audioTrack,
+    required ValueNotifier<int> maxStreamingBitrate,
   }) {
     return MaterialVideoControlsThemeData(
       topButtonBar: getTopButtonBarThemeData(context, key, title: title),
@@ -183,9 +182,9 @@ class PlayerHelper {
     GlobalKey<VideoState> key, {
     required String title,
     required ValueNotifier<bool> subtitleEnabled,
-    required ValueNotifier<MediaStream>? subtitleTrack,
-    required ValueNotifier<MediaStream>? audioTrack,
-    required ValueNotifier<int>? maxStreamingBitrate,
+    required ValueNotifier<MediaStream> subtitleTrack,
+    required ValueNotifier<MediaStream> audioTrack,
+    required ValueNotifier<int> maxStreamingBitrate,
   }) {
     return MaterialDesktopVideoControlsThemeData(
       topButtonBar: getTopButtonBarThemeData(context, key, title: title),
@@ -256,9 +255,9 @@ class PlayerHelper {
 
   List<Widget> getBottomButtonBarThemeData(
       ValueNotifier<bool> subtitleEnabled,
-      ValueNotifier<MediaStream>? subtitleTrack,
-      ValueNotifier<MediaStream>? audioTrack,
-      ValueNotifier<int>? maxStreamingBitrate,
+      ValueNotifier<MediaStream> subtitleTrack,
+      ValueNotifier<MediaStream> audioTrack,
+      ValueNotifier<int> maxStreamingBitrate,
       BuildContext context) {
     return [
       const MaterialPlayOrPauseButton(),
@@ -298,10 +297,10 @@ class PlayerHelper {
               builder: (context) => PlayerSettingsDialog(
                 playbackHelper: this,
                 showBitrate: showBitrate,
-                audioTrack: audioTrack!.value,
-                subtitleTrack: subtitleTrack!.value,
+                audioTrack: audioTrack.value,
+                subtitleTrack: subtitleTrack.value,
                 isSubtitleEnabled: subtitleEnabled.value,
-                maxStreamingBitrate: maxStreamingBitrate!.value,
+                maxStreamingBitrate: maxStreamingBitrate.value,
                 onSubtitleSelected: (value) async {
                   if (value != null) {
                     subtitleEnabled.value = value.index == -1 ? false : true;

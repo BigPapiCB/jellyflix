@@ -692,10 +692,6 @@ class ApiService {
     for (var view in views.data!.items!) {
       if (view.collectionType == CollectionType.playlists) {
         String? playlistsId = view.id;
-        // abort if no playlists folder exists
-        if (playlistsId == null) {
-          break;
-        }
 
         // filter playlist by name
         playlist = await _jellyfinApi!.getItemsApi().getItems(

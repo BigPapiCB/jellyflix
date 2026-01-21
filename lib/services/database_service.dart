@@ -38,17 +38,6 @@ class DatabaseService {
       String? key = await secureStorage
           .read('encryptionKey')
           .timeout(const Duration(milliseconds: 500), onTimeout: () => null);
-      if (key == null) {
-        // create a new key
-        final encryptionKeyUint8List = Hive.generateSecureKey();
-        await secureStorage
-            .write('encryptionKey', base64Url.encode(encryptionKeyUint8List))
-            .timeout(const Duration(milliseconds: 500), onTimeout: () => null);
-        // verify key was created
-        key = await secureStorage
-            .read('encryptionKey')
-            .timeout(const Duration(milliseconds: 500), onTimeout: () => null);
-      }
     } catch (e) {
       logger.e(e, error: 'Secure Storage error');
       logger.i('Falling back to different key');
